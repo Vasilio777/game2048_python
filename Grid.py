@@ -14,13 +14,13 @@ class Grid():
 
         self.t.shape('assets/Cell_tile.gif')
 
-        # self.generate_positions()
-        self.curr_positions = [
-            [4,2,4,4],
-            [2,2,2,None],
-            [2,2,2,2],
-            [2,4,4,2]
-        ]
+        self.generate_positions()
+        # self.curr_positions = [
+        #     [4,2,4,4],
+        #     [2,2,2,None],
+        #     [2,2,2,2],
+        #     [2,4,4,2]
+        # ]
 
     def generate_positions(self):
         self.curr_positions = [[None for _ in range(4)] for _ in range(4)]
@@ -36,12 +36,22 @@ class Grid():
         else:
             print('game over')
 
+    # me-eh, too complicated. Maybe later (never)
+    # def transpose(self, matrix, reverse=False):
+    #     if reverse:
+    #         matrix = [list(reversed(col)) for col in zip(*matrix)]
+    #     else:
+    #         matrix = [list(col) for col in zip(*matrix)]
+    #     return matrix
+
     def up(self):
         for j in range(len(self.curr_positions[0])):
             column = [self.curr_positions[i][j] for i in range(len(self.curr_positions))]
             self.merge_row(column)
             for i in range(len(self.curr_positions)):
                 self.curr_positions[i][j] = column[i]
+
+        self.fill_empty_cell()
 
     def down(self):
         for j in range(len(self.curr_positions[0])):
@@ -52,17 +62,22 @@ class Grid():
             for i in range(len(self.curr_positions)):
                 self.curr_positions[i][j] = column[i]
 
+        self.fill_empty_cell()
+
     def left(self):
         for i in range(len(self.curr_positions)):
             row = self.curr_positions[i]
             self.merge_row(row)
+
+        self.fill_empty_cell()
 
     def right(self):
         for i in range(len(self.curr_positions)):
             row = list(reversed(self.curr_positions[i]))
             self.merge_row(row)
             self.curr_positions[i] = list(reversed(row))
-
+        
+        self.fill_empty_cell()
 
     def merge_row(self, _row):
         merged = [False] * len(_row)
@@ -75,6 +90,16 @@ class Grid():
                         _row[k] = None
                         _row[j] = curr_val * 2
                         merged[j] = True
+                    break
+
+        for j in range(len(_row)):
+            curr_val = _row[j]
+            if curr_val is not None: continue 
+            for k in range(j + 1, len(_row)):
+                neighbor = _row[k]
+                if neighbor is not None:
+                    _row[j] = neighbor
+                    _row[k] = None
                     break
 
     def render_tick(self):
